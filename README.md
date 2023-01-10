@@ -1,2 +1,2 @@
 # SimpleVolumetrics
-High Performanced Volumetric Renderers
+High-Performance Volumetric Renderers
