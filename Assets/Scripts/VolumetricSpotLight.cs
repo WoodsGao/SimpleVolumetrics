@@ -68,5 +68,7 @@ public class VolumetricSpotLight : MonoBehaviour
         filter.mesh = cone;
 
         MeshRenderer renderer = child.AddComponent<MeshRenderer>();
+        Material material = new Material(Shader.Find("Volumetric/ConeVolumetric"));
+        renderer.material = material;
     }
 }
