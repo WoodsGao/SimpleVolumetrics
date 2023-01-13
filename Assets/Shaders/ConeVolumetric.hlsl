@@ -22,14 +22,14 @@ struct Attributes
 {
     float4 position: POSITION;
     // float2 texcoord     : TEXCOORD0;
-    UNITY_VERTEX_INPUT_INSTANCE_ID
+    // UNITY_VERTEX_INPUT_INSTANCE_ID
 };
 
 struct Varyings
 {
     float4 positionCS: SV_POSITION;
-    UNITY_VERTEX_INPUT_INSTANCE_ID
-    UNITY_VERTEX_OUTPUT_STEREO
+    // UNITY_VERTEX_INPUT_INSTANCE_ID
+    // UNITY_VERTEX_OUTPUT_STEREO
     float4 positionWS: TEXCOORD0;
     float4 viewDir: TEXCOORD1;
     // Spot Light View Space
@@ -41,8 +41,8 @@ struct Varyings
 Varyings vert(Attributes input)
 {
     Varyings output = (Varyings)0;
-    UNITY_SETUP_INSTANCE_ID(input);
-    UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
+    // UNITY_SETUP_INSTANCE_ID(input);
+    // UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
     output.positionCS = TransformObjectToHClip(input.position.xyz);
     output.positionWS = float4(TransformObjectToWorld(input.position.xyz), 1);
@@ -54,7 +54,7 @@ Varyings vert(Attributes input)
 
 half4 frag(Varyings input) : SV_Target
 {
-    UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+    // UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
     // some vertex are out of frastum, so it has to be calculated in fragment
     half4 shadowMapCoord = mul(_ShadowMapProjectMatrix, input.positionLVS);
@@ -64,10 +64,11 @@ half4 frag(Varyings input) : SV_Target
     float depth = tex2D(_ShadowMap, shadowMapCoord.xy).r;
     // depth *= _Range;
 
-    float rayLength = -input.positionLVS.z;
+    float rayLength = shadowMapCoord.z;
     float distance = depth - rayLength;
     float intensity = saturate(distance);
-    return half4(depth * _Range - rayLength,0,0,1);
+    return half4(0.5,0,0,1);
+    return half4(depth,-depth,0,1);
 
     half noise = GetNoise3D((input.positionWS.xyz + input.viewDir.xyz + 10) * _NoiseFactor + _Time.x * _Speed);
     noise = noise * 0.5 + 0.5;

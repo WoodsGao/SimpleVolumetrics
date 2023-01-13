@@ -83,7 +83,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _AlphaClip: 0
-    - _Angle: 120
+    - _Angle: 90
     - _Blend: 0
     - _BumpScale: 1
     - _ClearCoatMask: 0
@@ -102,7 +102,7 @@ Material:
     - _OcclusionStrength: 1
     - _Parallax: 0.005
     - _QueueOffset: 0
-    - _Range: 2
+    - _Range: 1000
     - _ReceiveShadows: 1
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0

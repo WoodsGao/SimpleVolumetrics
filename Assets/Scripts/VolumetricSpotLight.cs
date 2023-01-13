@@ -101,7 +101,7 @@ public class VolumetricSpotLight : MonoBehaviour
         child.SetActive(true);
 
         Camera camera = child.GetComponent<Camera>();
-        camera.farClipPlane = Range;
+        // camera.farClipPlane = Range;
         // camera.ResetProjectionMatrix();
         camera.Render();
 
@@ -111,7 +111,6 @@ public class VolumetricSpotLight : MonoBehaviour
         material.SetMatrix("_ShadowMapProjectMatrix", camera.projectionMatrix);
         material.SetFloat("_Range", camera.farClipPlane);
         material.SetTexture("_ShadowMap", tex);
-
 
         child.SetActive(false);
     }

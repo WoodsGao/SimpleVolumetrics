@@ -53,7 +53,7 @@ Shader "Volumetric/BlitShadowMap"
             {
                 float depth = tex2D(_CameraDepthTexture, input.uv.xy).r;
                 depth = Linear01Depth(depth, _ZBufferParams);
-                return half4(depth,0,0,1);
+                return half4(depth * 10,0,0,1);
                 // float depth = tex2D(_CameraDepthTexture, input.uv.xy).r;
                 half4 encode = EncodeFloatRGBA(clamp(depth, 0.0001, 0.9999));
                 return encode;
