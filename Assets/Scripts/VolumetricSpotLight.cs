@@ -6,14 +6,19 @@ public class VolumetricSpotLight : MonoBehaviour
 
     public float Range = 10f;
     public float Angle = 10f;
+    private string _rendererName = "VolumetricRenderer";
+    private string _cameraName = "VolumetricCamera";
 
-    private string _name = "VolumetricRenderer";
     [ContextMenu("Clear")]
     void Clear()
     {
-        var child = transform.Find(_name);
-        if (child != null)
-            DestroyImmediate(child.gameObject);
+        var renderer = transform.Find(_rendererName);
+        if (renderer != null)
+            DestroyImmediate(renderer.gameObject);
+
+        var camera = transform.Find(_cameraName);
+        if (camera != null)
+            DestroyImmediate(camera.gameObject);
     }
 
     Mesh CreateCone(float range, float angle, int edges = 100)
@@ -56,19 +61,58 @@ public class VolumetricSpotLight : MonoBehaviour
     [ContextMenu("Generate Volumetric Renderer")]
     void GenerateVolumetricRenderer()
     {
-        Clear();
+        // Clear();
 
-        GameObject child = new GameObject();
-        child.name = _name;
-        child.transform.SetParent(transform);
+        GameObject child = transform.Find(_rendererName).gameObject;
+        child.name = _rendererName;
+        // child.transform.SetParent(transform);
+        // child.transform.localPosition = new Vector3(0, 0, 0);
+        // child.transform.localRotation = Quaternion.identity;
 
         Mesh cone = CreateCone(Range, Angle);
 
-        MeshFilter filter = child.AddComponent<MeshFilter>();
+        MeshFilter filter = child.GetComponent<MeshFilter>();
         filter.mesh = cone;
 
-        MeshRenderer renderer = child.AddComponent<MeshRenderer>();
-        Material material = new Material(Shader.Find("Volumetric/ConeVolumetric"));
-        renderer.material = material;
+        MeshRenderer renderer = child.GetComponent<MeshRenderer>();
+        // Material material = new Material(Shader.Find("Volumetric/ConeVolumetric"));
+        Material material = renderer.sharedMaterial;
+
+        SetShadowMap(material);
+        material.SetFloat("_Angle", Angle);
+    }
+
+    private Texture2D RT2Texture2D(RenderTexture rt)
+    {
+        Texture2D tex = new Texture2D(rt.width, rt.height, TextureFormat.RGBA32, false);
+        // ReadPixels looks at the active RenderTexture.
+        RenderTexture.active = rt;
+        tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
+        tex.Apply();
+        return tex;
+    }
+
+    void SetShadowMap(Material material)
+    {
+        // GameObject child = new GameObject();
+        // child.name = _cameraName;
+        // child.transform.SetParent(transform);
+        GameObject child = transform.Find(_cameraName).gameObject;
+        child.SetActive(true);
+
+        Camera camera = child.GetComponent<Camera>();
+        camera.farClipPlane = Range;
+        // camera.ResetProjectionMatrix();
+        camera.Render();
+
+        Texture2D tex = RT2Texture2D(camera.targetTexture);
+        tex.wrapMode = TextureWrapMode.Clamp;
+        material.SetMatrix("_ShadowMapViewMatrix", camera.worldToCameraMatrix);
+        material.SetMatrix("_ShadowMapProjectMatrix", camera.projectionMatrix);
+        material.SetFloat("_Range", camera.farClipPlane);
+        material.SetTexture("_ShadowMap", tex);
+
+
+        child.SetActive(false);
     }
 }
