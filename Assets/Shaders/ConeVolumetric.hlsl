@@ -6,14 +6,14 @@
 #include "Noise3D.hlsl"
 
 CBUFFER_START(UnityPerMaterial)
-    half4 _BaseColor;
-    half _NoiseFactor;
-    half _Speed;
-    half _Angle;
-    half _Range;
-    half4 _ShadowMapZBufferParams;
-    half4x4 _ShadowMapViewMatrix;
-    half4x4 _ShadowMapProjectMatrix;
+    float4 _BaseColor;
+    float _NoiseFactor;
+    float _Speed;
+    float _Angle;
+    float _Range;
+    float4 _ShadowMapZBufferParams;
+    float4x4 _ShadowMapViewMatrix;
+    float4x4 _ShadowMapProjectMatrix;
 CBUFFER_END
 
 sampler2D _ShadowMap;
@@ -52,13 +52,16 @@ Varyings vert(Attributes input)
     return output;
 }
 
-half4 frag(Varyings input) : SV_Target
+float4 frag(Varyings input) : SV_Target
 {
     // UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
     // some vertex are out of frastum, so it has to be calculated in fragment
-    half4 shadowMapCoord = mul(_ShadowMapProjectMatrix, input.positionLVS);
-    shadowMapCoord = shadowMapCoord / shadowMapCoord.w * 0.5 + 0.5;
+    float4 shadowMapCoord = mul(_ShadowMapProjectMatrix, input.positionWS);
+    shadowMapCoord /= shadowMapCoord.w;
+    shadowMapCoord *= 0.5;
+    shadowMapCoord += 0.5;
+    return float4(shadowMapCoord.xyz,1);
 
     // float depth = DecodeFloatRGBA(tex2D(_ShadowMap, shadowMapCoord.xy));
     float depth = tex2D(_ShadowMap, shadowMapCoord.xy).r;
@@ -67,15 +70,13 @@ half4 frag(Varyings input) : SV_Target
     float rayLength = shadowMapCoord.z;
     float distance = depth - rayLength;
     float intensity = saturate(distance);
-    return half4(0.5,0,0,1);
-    return half4(depth,-depth,0,1);
 
-    half noise = GetNoise3D((input.positionWS.xyz + input.viewDir.xyz + 10) * _NoiseFactor + _Time.x * _Speed);
+    float noise = GetNoise3D((input.positionWS.xyz + input.viewDir.xyz + 10) * _NoiseFactor + _Time.x * _Speed);
     noise = noise * 0.5 + 0.5;
-    half3 color = _BaseColor.xyz * _BaseColor.a;
+    float3 color = _BaseColor.xyz * _BaseColor.a;
     color *= noise * intensity;
 
-    return half4(color, 1);
+    return float4(color, 1);
 }
 
 #endif

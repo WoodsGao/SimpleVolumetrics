@@ -108,7 +108,7 @@ public class VolumetricSpotLight : MonoBehaviour
         Texture2D tex = RT2Texture2D(camera.targetTexture);
         tex.wrapMode = TextureWrapMode.Clamp;
         material.SetMatrix("_ShadowMapViewMatrix", camera.worldToCameraMatrix);
-        material.SetMatrix("_ShadowMapProjectMatrix", camera.projectionMatrix);
+        material.SetMatrix("_ShadowMapProjectMatrix", camera.projectionMatrix * camera.worldToCameraMatrix);
         material.SetFloat("_Range", camera.farClipPlane);
         material.SetTexture("_ShadowMap", tex);
 
