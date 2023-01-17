@@ -61,15 +61,18 @@ float4 frag(Varyings input) : SV_Target
     shadowMapCoord /= shadowMapCoord.w;
     shadowMapCoord *= 0.5;
     shadowMapCoord += 0.5;
-    return float4(shadowMapCoord.xyz,1);
+    // return float4(shadowMapCoord.xyz,1);
 
     // float depth = DecodeFloatRGBA(tex2D(_ShadowMap, shadowMapCoord.xy));
     float depth = tex2D(_ShadowMap, shadowMapCoord.xy).r;
+    // depth *= 100;
+
     // depth *= _Range;
 
-    float rayLength = shadowMapCoord.z;
+    float rayLength = -input.positionLVS.z;
     float distance = depth - rayLength;
     float intensity = saturate(distance);
+    return float4(depth,-depth,0,1);
 
     float noise = GetNoise3D((input.positionWS.xyz + input.viewDir.xyz + 10) * _NoiseFactor + _Time.x * _Speed);
     noise = noise * 0.5 + 0.5;

@@ -1,27 +1,101 @@
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
+using UnityEditor;
 
+[ExecuteInEditMode]
 public class VolumetricSpotLight : MonoBehaviour
 {
 
     public float Range = 10f;
-    public float Angle = 10f;
-    private string _rendererName = "VolumetricRenderer";
-    private string _cameraName = "VolumetricCamera";
+    public float Angle = 90f;
 
-    [ContextMenu("Clear")]
-    void Clear()
+    public GameObject RendererObj;
+    public GameObject CameraObj;
+
+    private string _texPath = "VolumetricCamera";
+    private string _texRoot = "Assets/Texture";
+    private Material _material;
+    private Camera _camera;
+
+
+#if UNITY_EDITOR
+    // [ContextMenu("Generate Volumetric Renderer")]
+    void GenerateVolumetricRenderer()
     {
-        var renderer = transform.Find(_rendererName);
-        if (renderer != null)
-            DestroyImmediate(renderer.gameObject);
+        Mesh cone = CreateCone(Range, Angle);
 
-        var camera = transform.Find(_cameraName);
-        if (camera != null)
-            DestroyImmediate(camera.gameObject);
+        MeshFilter filter = RendererObj.GetComponent<MeshFilter>();
+        filter.mesh = cone;
+
+        SetShadowMap();
+    }
+#endif
+
+    // life circle
+    void OnValidate()
+    {
+        if (_camera == null || _material == null) return;
+        Angle = Mathf.Min(179.9f, Angle);
+        _camera.farClipPlane = Range;
+        _camera.fieldOfView = Angle;
+        _material.SetFloat("_Angle", Angle);
+        _material.SetFloat("_Range", Range);
+#if UNITY_EDITOR
+        if (IsInvoking()) CancelInvoke();
+        Invoke("GenerateVolumetricRenderer", 1f);
+#endif
     }
 
-    Mesh CreateCone(float range, float angle, int edges = 100)
+    void OnEnable()
+    {
+        MeshRenderer renderer = RendererObj.GetComponent<MeshRenderer>();
+        _material = renderer.sharedMaterial;
+
+        _camera = CameraObj.GetComponent<Camera>();
+        UpdateMaterialProps();
+    }
+
+    void Update()
+    {
+        UpdateMaterialProps();
+    }
+
+    // custom proceduels
+    private void UpdateMaterialProps()
+    {
+        _material.SetMatrix("_ShadowMapViewMatrix", _camera.worldToCameraMatrix);
+        _material.SetMatrix("_ShadowMapProjectMatrix", _camera.projectionMatrix * _camera.worldToCameraMatrix);
+    }
+
+    private void SetShadowMap()
+    {
+        Debug.Log("Render Shadowmap");
+        CameraObj.SetActive(true);
+        _camera.Render();
+
+        Texture2D texTemp = RT2Texture2D(_camera.targetTexture);
+        texTemp.wrapMode = TextureWrapMode.Clamp;
+        byte[] dataBytes = texTemp.EncodeToPNG();
+        string savePath = Application.dataPath + "/SampleCircle.png";
+        FileStream fileStream = File.Open(savePath, FileMode.OpenOrCreate);
+        fileStream.Write(dataBytes, 0, dataBytes.Length);
+        fileStream.Close();
+
+        TextureImporter texImporter = AssetImporter.GetAtPath("Assets/SampleCircle.png") as TextureImporter;
+        texImporter.sRGBTexture = false;
+        Texture2D tex = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/SampleCircle.png");
+        
+        _material.SetTexture("_ShadowMap", tex);
+
+        CameraObj.SetActive(false);
+
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+    }
+
+    // helper funtions
+    private Mesh CreateCone(float range, float angle, int edges = 100)
     {
         Mesh cone = new Mesh();
         cone.name = "Cone";
@@ -58,30 +132,6 @@ public class VolumetricSpotLight : MonoBehaviour
         return cone;
     }
 
-    [ContextMenu("Generate Volumetric Renderer")]
-    void GenerateVolumetricRenderer()
-    {
-        // Clear();
-
-        GameObject child = transform.Find(_rendererName).gameObject;
-        child.name = _rendererName;
-        // child.transform.SetParent(transform);
-        // child.transform.localPosition = new Vector3(0, 0, 0);
-        // child.transform.localRotation = Quaternion.identity;
-
-        Mesh cone = CreateCone(Range, Angle);
-
-        MeshFilter filter = child.GetComponent<MeshFilter>();
-        filter.mesh = cone;
-
-        MeshRenderer renderer = child.GetComponent<MeshRenderer>();
-        // Material material = new Material(Shader.Find("Volumetric/ConeVolumetric"));
-        Material material = renderer.sharedMaterial;
-
-        SetShadowMap(material);
-        material.SetFloat("_Angle", Angle);
-    }
-
     private Texture2D RT2Texture2D(RenderTexture rt)
     {
         Texture2D tex = new Texture2D(rt.width, rt.height, TextureFormat.RGBA32, false);
@@ -90,28 +140,5 @@ public class VolumetricSpotLight : MonoBehaviour
         tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
         tex.Apply();
         return tex;
-    }
-
-    void SetShadowMap(Material material)
-    {
-        // GameObject child = new GameObject();
-        // child.name = _cameraName;
-        // child.transform.SetParent(transform);
-        GameObject child = transform.Find(_cameraName).gameObject;
-        child.SetActive(true);
-
-        Camera camera = child.GetComponent<Camera>();
-        // camera.farClipPlane = Range;
-        // camera.ResetProjectionMatrix();
-        camera.Render();
-
-        Texture2D tex = RT2Texture2D(camera.targetTexture);
-        tex.wrapMode = TextureWrapMode.Clamp;
-        material.SetMatrix("_ShadowMapViewMatrix", camera.worldToCameraMatrix);
-        material.SetMatrix("_ShadowMapProjectMatrix", camera.projectionMatrix * camera.worldToCameraMatrix);
-        material.SetFloat("_Range", camera.farClipPlane);
-        material.SetTexture("_ShadowMap", tex);
-
-        child.SetActive(false);
     }
 }
