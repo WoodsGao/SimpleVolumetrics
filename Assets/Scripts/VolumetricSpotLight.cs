@@ -13,8 +13,7 @@ public class VolumetricSpotLight : MonoBehaviour
     public GameObject RendererObj;
     public GameObject CameraObj;
 
-    private string _texPath = "VolumetricCamera";
-    private string _texRoot = "Assets/Texture";
+    private string _savePath = "Assets/test.texture2D";
     private Material _material;
     private Camera _camera;
 
@@ -37,10 +36,6 @@ public class VolumetricSpotLight : MonoBehaviour
     {
         if (_camera == null || _material == null) return;
         Angle = Mathf.Min(179.9f, Angle);
-        _camera.farClipPlane = Range;
-        _camera.fieldOfView = Angle;
-        _material.SetFloat("_Angle", Angle);
-        _material.SetFloat("_Range", Range);
 #if UNITY_EDITOR
         if (IsInvoking()) CancelInvoke();
         Invoke("GenerateVolumetricRenderer", 1f);
@@ -65,33 +60,27 @@ public class VolumetricSpotLight : MonoBehaviour
     private void UpdateMaterialProps()
     {
         _material.SetMatrix("_ShadowMapViewMatrix", _camera.worldToCameraMatrix);
-        _material.SetMatrix("_ShadowMapProjectMatrix", _camera.projectionMatrix * _camera.worldToCameraMatrix);
+        _material.SetMatrix("_ShadowMapProjectMatrix", _camera.projectionMatrix);
     }
 
     private void SetShadowMap()
     {
         Debug.Log("Render Shadowmap");
         CameraObj.SetActive(true);
+
+        RenderTexture rt = RenderTexture.GetTemporary(2048, 2048, 16, RenderTextureFormat.RFloat, RenderTextureReadWrite.Linear);
+        _camera.targetTexture = rt;
         _camera.Render();
 
-        Texture2D texTemp = RT2Texture2D(_camera.targetTexture);
-        texTemp.wrapMode = TextureWrapMode.Clamp;
-        byte[] dataBytes = texTemp.EncodeToPNG();
-        string savePath = Application.dataPath + "/SampleCircle.png";
-        FileStream fileStream = File.Open(savePath, FileMode.OpenOrCreate);
-        fileStream.Write(dataBytes, 0, dataBytes.Length);
-        fileStream.Close();
+        Texture2D tex2d = RT2Texture2D(rt);
+        tex2d.wrapMode = TextureWrapMode.Clamp;
+        AssetDatabase.CreateAsset(tex2d, _savePath);
 
-        TextureImporter texImporter = AssetImporter.GetAtPath("Assets/SampleCircle.png") as TextureImporter;
-        texImporter.sRGBTexture = false;
-        Texture2D tex = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/SampleCircle.png");
-        
-        _material.SetTexture("_ShadowMap", tex);
+        _material.SetTexture("_ShadowMap", tex2d);
 
+        _camera.targetTexture = null;
+        RenderTexture.ReleaseTemporary(rt);
         CameraObj.SetActive(false);
-
-        AssetDatabase.SaveAssets();
-        AssetDatabase.Refresh();
     }
 
     // helper funtions
@@ -134,11 +123,12 @@ public class VolumetricSpotLight : MonoBehaviour
 
     private Texture2D RT2Texture2D(RenderTexture rt)
     {
-        Texture2D tex = new Texture2D(rt.width, rt.height, TextureFormat.RGBA32, false);
+        Texture2D tex = new Texture2D(rt.width, rt.height, TextureFormat.RFloat, false);
         // ReadPixels looks at the active RenderTexture.
         RenderTexture.active = rt;
         tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
         tex.Apply();
+        RenderTexture.active = null;
         return tex;
     }
 }

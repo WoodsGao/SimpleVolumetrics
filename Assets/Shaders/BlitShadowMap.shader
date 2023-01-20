@@ -23,7 +23,6 @@ Shader "Volumetric/BlitShadowMap"
             #pragma fragment frag
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            #include "Utils.hlsl"
 
             sampler2D _CameraDepthTexture;
 
@@ -51,15 +50,9 @@ Shader "Volumetric/BlitShadowMap"
 
             half4 frag(Varyings input) : SV_Target
             {
-                
                 float depth = tex2D(_CameraDepthTexture, input.uv.xy).r;
                 depth = LinearEyeDepth(depth, _ZBufferParams);
-                depth *= 0.01;
-                return half4(depth,0,0,1);
-                // float depth = tex2D(_CameraDepthTexture, input.uv.xy).r;
-                half4 encode = EncodeFloatRGBA(clamp(depth, 0.0001, 0.9999));
-                return encode;
-                // depth = DecodeFloatRGBA(encode);
+                return half4(depth * 0.01,0,0,0);
             }
 
             ENDHLSL

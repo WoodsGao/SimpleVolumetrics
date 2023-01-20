@@ -213,7 +213,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef1515e8cefc8174a88589e5f366ee64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Range: 2
+  Range: 6
   Angle: 90
   RendererObj: {fileID: 7107230887119741220}
   CameraObj: {fileID: 6639891482925338473}
@@ -274,9 +274,9 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.01
-  far clip plane: 2
-  field of view: 179
+  near clip plane: 0.1
+  far clip plane: 6
+  field of view: 90
   orthographic: 0
   orthographic size: 5
   m_Depth: 0
@@ -284,7 +284,7 @@ Camera:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 8400000, guid: 108c650b1429ba54bafabb903d95f606, type: 2}
+  m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
@@ -311,7 +311,7 @@ MonoBehaviour:
   m_RequiresOpaqueTextureOption: 0
   m_CameraType: 0
   m_Cameras: []
-  m_RendererIndex: -1
+  m_RendererIndex: 0
   m_VolumeLayerMask:
     serializedVersion: 2
     m_Bits: 1
