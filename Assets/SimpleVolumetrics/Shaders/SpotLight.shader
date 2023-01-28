@@ -37,6 +37,7 @@ Shader "Volumetric/SpotLight"
                 #pragma multi_compile _ DOTS_INSTANCING_ON
 
                 #pragma multi_compile _ VOLUMETRIC_SHADOW_ON
+                
                 #include "SpotLight.hlsl"
 
                 ENDHLSL
@@ -59,6 +60,7 @@ Shader "Volumetric/SpotLight"
             #pragma multi_compile _ DOTS_INSTANCING_ON
 
             #pragma multi_compile _ VOLUMETRIC_SHADOW_ON
+
             #include "SpotLight.hlsl"
 
             ENDHLSL
