@@ -59,7 +59,6 @@ public class VolumetricSpotLight : MonoBehaviour
     // custom proceduels
     private void UpdateMaterialProps()
     {
-        _material.SetMatrix("_ShadowMapViewMatrix", _camera.worldToCameraMatrix);
         _material.SetMatrix("_ShadowMapProjectMatrix", _camera.projectionMatrix);
     }
 

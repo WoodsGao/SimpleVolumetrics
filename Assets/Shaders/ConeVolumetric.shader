@@ -5,12 +5,10 @@ Shader "Volumetric/ConeVolumetric"
         [MainColor] _BaseColor("Base Color", Color) = (1, 1, 1, 1)
         _NoiseFactor("Noise Factor", Float) = 1.0
         _Speed("Noise Speed", Float) = 1.0
-        _Minimum("Minimum", Range(0, 1)) = 0.1
         _EdgeContrast("EdgeContrast", Float) = 1
         _Intensity("Intensity", Float) = 1
-        _PowerFactor("PowerFactor", Float) = 1
         _ShadowMap("Shadow Map", 2D) = "black"
-        _ShadowMapZBufferParams("Shadow Map ZBuffer Params", Vector) = (0, 0, 0, 0)
+        [Toggle(VOLUMETRIC_SHADOW_ON)]_ShadowOn("Shadow On",int) = 1
     }
 
     SubShader
@@ -38,6 +36,7 @@ Shader "Volumetric/ConeVolumetric"
                 #pragma multi_compile_instancing
                 #pragma multi_compile _ DOTS_INSTANCING_ON
 
+                #pragma multi_compile _ VOLUMETRIC_SHADOW_ON
                 #include "ConeVolumetric.hlsl"
 
                 ENDHLSL
@@ -59,6 +58,7 @@ Shader "Volumetric/ConeVolumetric"
             #pragma multi_compile_instancing
             #pragma multi_compile _ DOTS_INSTANCING_ON
 
+            #pragma multi_compile _ VOLUMETRIC_SHADOW_ON
             #include "ConeVolumetric.hlsl"
 
             ENDHLSL
