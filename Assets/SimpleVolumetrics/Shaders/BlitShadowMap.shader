@@ -8,14 +8,12 @@ Shader "Volumetric/BlitShadowMap"
     {
         Tags { "RenderType" = "Opaque" "Queue" = "Overlay" "RenderPipeline" = "UniversalPipeline" }
 
-        ZTest Always
-
         Pass
         {
             Tags{"LightMode" = "UniversalForward"}
 
-            Blend One Zero
             Cull Off
+            ZTest Always
 
             HLSLPROGRAM
 
@@ -52,7 +50,7 @@ Shader "Volumetric/BlitShadowMap"
             {
                 float depth = tex2D(_CameraDepthTexture, input.uv.xy).r;
                 depth = LinearEyeDepth(depth, _ZBufferParams);
-                return half4(depth * 0.01,0,0,0);
+                return half4(depth * 0.001,0,0,0);
             }
 
             ENDHLSL

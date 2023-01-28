@@ -38,6 +38,7 @@ namespace SimpleVolumetrics
             if (_camera == null || _material == null) return;
             if (Range == _range && Angle == _angle) return;
             Angle = Mathf.Min(179.9f, Angle);
+            _camera.fieldOfView = Angle;
             if (ShadowOn)
                 _material.EnableKeyword("VOLUMETRIC_SHADOW_ON");
             else
@@ -75,13 +76,15 @@ namespace SimpleVolumetrics
         private void SetShadowMap()
         {
             Debug.Log("Render Shadowmap:" + GetInstanceID());
+            Debug.Log(_camera.projectionMatrix);
             _cameraObj.SetActive(true);
 
-            RenderTexture rt = RenderTexture.GetTemporary(2048, 2048, 16, RenderTextureFormat.RFloat, RenderTextureReadWrite.Linear);
-            _camera.targetTexture = rt;
+            // RenderTexture rt = RenderTexture.GetTemporary(2048, 2048, 16, RenderTextureFormat.RFloat, RenderTextureReadWrite.Linear);
+            // _camera.targetTexture = rt;
             _camera.Render();
+            Debug.Log(_camera.projectionMatrix);
 
-            Texture2D tex2d = RT2Texture2D(rt);
+            Texture2D tex2d = RT2Texture2D(_camera.targetTexture);
             tex2d.wrapMode = TextureWrapMode.Clamp;
 
             _savePath = $"{Config.SavePath}/SpotLightShadowmap_{GetInstanceID()}.texture2D";
@@ -89,8 +92,8 @@ namespace SimpleVolumetrics
 
             _material.SetTexture("_ShadowMap", tex2d);
 
-            _camera.targetTexture = null;
-            RenderTexture.ReleaseTemporary(rt);
+            // _camera.targetTexture = null;
+            // RenderTexture.ReleaseTemporary(rt);
             _cameraObj.SetActive(false);
         }
 

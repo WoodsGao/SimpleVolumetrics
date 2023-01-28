@@ -64,8 +64,8 @@ float4 frag(Varyings input) : SV_Target
 
     float depth = tex2D(_ShadowMap, shadowMapCoord.xy);
     // return half4(depth, -depth, 0, 1);
-    depth *= 100;
-    float distance = depth - rayLength;
+    depth *= 1000;
+    float distance = max(0, depth - rayLength);
 
     intensity *= 1 - exp2(- distance * distance * _EdgeContrast);
 #endif
