@@ -1,4 +1,4 @@
-Shader "Volumetric/SpotLight"
+Shader "Volumetric/VolumetricBase"
 {
     Properties
     {
@@ -7,14 +7,17 @@ Shader "Volumetric/SpotLight"
         _Speed("Noise Speed", Float) = 1.0
         _EdgeContrast("EdgeContrast", Float) = 1
         _Intensity("Intensity", Float) = 1
+        _Range("Range", Float) = 1
+        _Angle("Angle", Float) = 1
         _ShadowMap("Shadow Map", Cube) = "black"
+        [Toggle(VOLUMETRIC_SPOT_LIGHT)]_SpotLight("SpotLight", int) = 0
+        [Toggle(VOLUMETRIC_POINT_LIGHT)]_PointLight("PointLight", int) = 0
     }
 
     SubShader
     {
         Tags { "RenderType" = "Transparent" "Queue" = "Transparent+101" "RenderPipeline" = "UniversalPipeline" }
 
-        BlendOp Add
         Blend One One
         ZWrite Off
         ZTest LEqual
@@ -24,21 +27,8 @@ Shader "Volumetric/SpotLight"
             Tags{"LightMode" = "SRPDefaultUnlit"}
             Cull Front
 
-
             HLSLPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            
-            //--------------------------------------
-            // GPU Instancing
-            #pragma multi_compile_instancing
-            #pragma multi_compile _ DOTS_INSTANCING_ON
-
-            #pragma multi_compile _ VOLUMETRIC_SHADOW_ON
-            #pragma multi_compile _ VOLUMETRIC_SPOT_LIGHT
-
             #include "Volumetric.hlsl"
-
             ENDHLSL
         }
 
@@ -47,21 +37,8 @@ Shader "Volumetric/SpotLight"
             Tags{"LightMode" = "UniversalForward"}
             Cull Back
 
-
             HLSLPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            
-            //--------------------------------------
-            // GPU Instancing
-            #pragma multi_compile_instancing
-            #pragma multi_compile _ DOTS_INSTANCING_ON
-
-            #pragma multi_compile _ VOLUMETRIC_SHADOW_ON
-            #pragma multi_compile _ VOLUMETRIC_SPOT_LIGHT
-
             #include "Volumetric.hlsl"
-
             ENDHLSL
         }
     }

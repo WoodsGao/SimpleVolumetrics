@@ -12,7 +12,7 @@ namespace SimpleVolumetrics
         private bool _shadowOn = true;
 
         private string _savePath;
-        private Material _material;
+        protected Material _material;
         private GameObject _cameraObj;
         private Camera _camera;
 
@@ -57,7 +57,7 @@ namespace SimpleVolumetrics
 #endif
 
         // life circle
-        void OnValidate()
+        protected virtual void OnValidate()
         {
             if (_material == null) return;
             if (ShadowOn == _shadowOn) return;
@@ -73,7 +73,7 @@ namespace SimpleVolumetrics
             _shadowOn = ShadowOn;
         }
 
-        void Awake()
+        protected virtual void Awake()
         {
             MeshRenderer renderer = GetComponent<MeshRenderer>();
             _material = renderer.material;
@@ -88,6 +88,10 @@ namespace SimpleVolumetrics
 
             _cameraObj = transform.Find("VolumetricCamera").gameObject;
             _camera = _cameraObj.GetComponent<Camera>();
+        }
+
+        protected virtual void Update()
+        {
         }
 
         // helper funtions
