@@ -7,7 +7,7 @@ Shader "Volumetric/SpotLight"
         _Speed("Noise Speed", Float) = 1.0
         _EdgeContrast("EdgeContrast", Float) = 1
         _Intensity("Intensity", Float) = 1
-        _ShadowMap("Shadow Map", 2D) = "black"
+        _ShadowMap("Shadow Map", Cube) = "black"
     }
 
     SubShader
@@ -16,7 +16,7 @@ Shader "Volumetric/SpotLight"
 
         BlendOp Add
         Blend One One
-        ZWrite On
+        ZWrite Off
         ZTest LEqual
 
         Pass
