@@ -8,7 +8,6 @@ Shader "Volumetric/SpotLight"
         _EdgeContrast("EdgeContrast", Float) = 1
         _Intensity("Intensity", Float) = 1
         _ShadowMap("Shadow Map", 2D) = "black"
-        // [Toggle(VOLUMETRIC_SHADOW_ON)]_ShadowOn("Shadow On",int) = 1
     }
 
     SubShader
@@ -22,46 +21,46 @@ Shader "Volumetric/SpotLight"
 
         Pass
         {
-                Tags{"LightMode" = "SRPDefaultUnlit"}
+            Tags{"LightMode" = "SRPDefaultUnlit"}
+            Cull Front
 
-                Cull Front
-
-                HLSLPROGRAM
-
-                #pragma vertex vert
-                #pragma fragment frag
-            
-                //--------------------------------------
-                // GPU Instancing
-                #pragma multi_compile_instancing
-                #pragma multi_compile _ DOTS_INSTANCING_ON
-
-                #pragma multi_compile _ VOLUMETRIC_SHADOW_ON
-                
-                #include "SpotLight.hlsl"
-
-                ENDHLSL
-        }
-
-        Pass
-        {
-            Tags{"LightMode" = "UniversalForward"}
-
-            Cull Back
 
             HLSLPROGRAM
-
             #pragma vertex vert
             #pragma fragment frag
-
+            
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
             #pragma multi_compile _ DOTS_INSTANCING_ON
 
             #pragma multi_compile _ VOLUMETRIC_SHADOW_ON
+            #pragma multi_compile _ VOLUMETRIC_SPOT_LIGHT
 
-            #include "SpotLight.hlsl"
+            #include "Volumetric.hlsl"
+
+            ENDHLSL
+        }
+
+        Pass
+        {
+            Tags{"LightMode" = "UniversalForward"}
+            Cull Back
+
+
+            HLSLPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+            #pragma multi_compile _ DOTS_INSTANCING_ON
+
+            #pragma multi_compile _ VOLUMETRIC_SHADOW_ON
+            #pragma multi_compile _ VOLUMETRIC_SPOT_LIGHT
+
+            #include "Volumetric.hlsl"
 
             ENDHLSL
         }
