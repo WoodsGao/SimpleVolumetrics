@@ -16,6 +16,10 @@ namespace SimpleVolumetrics
             // instantiate material
             MeshRenderer renderer = obj.GetComponent<MeshRenderer>();
             renderer.sharedMaterial = Material.Instantiate(renderer.sharedMaterial);
+            if (renderer.sharedMaterial.GetFloat("_SHADOW") > 0.5f)
+            {
+                Utils.RefreshShadowMapByMaterial(renderer.sharedMaterial);
+            }
 
             // update mesh bounds
             MeshFilter filter = obj.GetComponent<MeshFilter>();

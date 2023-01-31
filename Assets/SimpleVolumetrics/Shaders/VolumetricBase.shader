@@ -13,7 +13,7 @@ Shader "Volumetric/VolumetricBase"
         [Header(Shadow)]
         [VolumetricShadow] _SHADOW("Shadow", Float) = 0
         [PowerSlider(2.0)] _EdgeContrast("EdgeContrast", Range(0, 100)) = 1
-        [NoScaleOffset]_ShadowMap("Shadow Map", Cube) = "black" {}
+        [NoScaleOffset]_ShadowMap("Shadow Map", Cube) = "white" {}
 
         [Header(Cast vertex to floor)]
         [Toggle(VOLUMETRIC_CAST_TO_FLOOR_ON)] _CAST_TO_FLOOR("Cast To Floor", Float) = 0

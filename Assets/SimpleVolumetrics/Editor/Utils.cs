@@ -3,6 +3,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using UnityEngine.Rendering;
 
 namespace SimpleVolumetrics
 {
@@ -82,6 +83,10 @@ namespace SimpleVolumetrics
             camera.nearClipPlane = 0.1f;
             camera.farClipPlane = 1000;
 
+            // change render pipeline asset
+            RenderPipelineAsset originPipeline = QualitySettings.renderPipeline;
+            QualitySettings.renderPipeline = Resources.Load<RenderPipelineAsset>("VolumetricShadowRenderer");
+
             camera.gameObject.SetActive(true);
 
             camera.Render();
@@ -90,6 +95,8 @@ namespace SimpleVolumetrics
             tex2d.wrapMode = TextureWrapMode.Clamp;
 
             camera.gameObject.SetActive(false);
+
+            QualitySettings.renderPipeline = originPipeline;
             return tex2d;
         }
 
