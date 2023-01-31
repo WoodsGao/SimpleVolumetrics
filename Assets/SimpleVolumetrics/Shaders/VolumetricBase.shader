@@ -12,6 +12,7 @@ Shader "Volumetric/VolumetricBase"
 
         [Header(Shadow)]
         [VolumetricShadow] _SHADOW("Shadow", Float) = 0
+        _ShadowSoftness("Shadow Softness", Range(0, 1)) = 0.5
         [PowerSlider(2.0)] _EdgeContrast("EdgeContrast", Range(0, 100)) = 1
         [NoScaleOffset]_ShadowMap("Shadow Map", Cube) = "white" {}
 

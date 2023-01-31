@@ -13,6 +13,8 @@ CBUFFER_START(UnityPerMaterial)
 
     float _FloorHeight;
 
+    float _ShadowSoftness;
+
     float _VATDensity;
     float _VATScale;
     float _VATSpeed;
@@ -101,7 +103,7 @@ float4 frag(Varyings input) : SV_Target
     float distance = max(0, depth - rayLength);
     // return half4(distance, -distance, 0, 1);
 
-    intensity *= 1 - exp2(- distance * distance * _EdgeContrast);
+    intensity *= lerp(_ShadowSoftness, 1, 1 - exp2(- distance * distance * _EdgeContrast));
 #endif
 
     float noise = GetNoise3D(input.noiseCoord.xyz);
