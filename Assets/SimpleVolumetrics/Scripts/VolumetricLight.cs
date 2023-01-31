@@ -6,19 +6,22 @@ namespace SimpleVolumetrics
 {
     [ExecuteInEditMode]
     [RequireComponent(typeof(Light))]
-    public class VolumetricLight : VolumetricBase
+    public class VolumetricLight : MonoBehaviour
     {
         private Light _light;
-        protected override void Awake()
+        private Material _material;
+        void Awake()
         {
-            base.Awake();
             _light = GetComponent<Light>();
+            _material = GetComponent<MeshRenderer>().sharedMaterial;
         }
-        protected override void Update()
+        void Update()
         {
-            base.Update();
-            base._material.SetFloat("_Range", _light.range);
-            base._material.SetFloat("_Angle", Mathf.Tan(Mathf.Deg2Rad * _light.spotAngle * 0.5f));
+#if UNITY_EDITOR
+            _material = GetComponent<MeshRenderer>().sharedMaterial;
+#endif
+            _material.SetFloat("_Range", _light.range);
+            _material.SetFloat("_Angle", Mathf.Tan(Mathf.Deg2Rad * _light.spotAngle * 0.5f));
         }
     }
 }
