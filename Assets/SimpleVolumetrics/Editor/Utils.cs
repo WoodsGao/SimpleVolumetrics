@@ -2,6 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace SimpleVolumetrics
 {
@@ -27,6 +28,7 @@ namespace SimpleVolumetrics
             }
             else
             {
+                CaptureShadowMap(objsWithMaterial[0]);
                 if (objsWithMaterial.Count > 1)
                 {
                     string output = "";
@@ -36,23 +38,28 @@ namespace SimpleVolumetrics
                     }
                     Debug.LogWarning($"Simple Volumetrics: More than one GameObject use this material. {output}");
                 }
-                CaptureShadowMap(objsWithMaterial[0]);
             }
         }
 
-        [MenuItem("GameObject/SimpleVolumetric/RefreshAllShadowMap", false, 22)]
+        [MenuItem("GameObject/SimpleVolumetric/RefreshAllShadowMap", false, 52)]
         public static void RefreshAllShadowMap(MenuCommand menuCommand)
         {
             Debug.Log("Simple Volumetrics: RefreshAllShadowMap");
+            foreach (string var in Directory.GetFiles(SavePath))
+            {
+                File.Delete(var);
+            }
             GameObject[] objs = GameObject.FindGameObjectsWithTag("SimpleVolumetrics");
             HashSet<Material> materials = new HashSet<Material>();
             foreach (var obj in objs)
             {
                 materials.Add(obj.GetComponent<MeshRenderer>().sharedMaterial);
             }
+            Debug.Log($"Simple Volumetrics: Find {materials.Count} materials");
             foreach (var material in materials)
             {
-                RefreshShadowMapByMaterial(material);
+                if (material.GetFloat("_SHADOW") > 0.5f)
+                    RefreshShadowMapByMaterial(material);
             }
         }
 
@@ -88,6 +95,12 @@ namespace SimpleVolumetrics
 
         private static void CaptureShadowMap(GameObject volumetricObj)
         {
+            // update mesh bounds
+            MeshFilter filter = volumetricObj.GetComponent<MeshFilter>();
+            Bounds bounds = filter.sharedMesh.bounds;
+            bounds.size = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+            filter.sharedMesh.bounds = bounds;
+
             Camera camera = volumetricObj.transform.Find("VolumetricCamera").GetComponent<Camera>();
             Material material = volumetricObj.GetComponent<MeshRenderer>().sharedMaterial;
 
@@ -104,6 +117,7 @@ namespace SimpleVolumetrics
             AssetDatabase.CreateAsset(cubemap, savePath);
 
             material.SetTexture("_ShadowMap", cubemap);
+            AssetDatabase.Refresh();
             Debug.Log("Simple Volumetrics: Refresh Shadowmap success " + savePath);
         }
     }

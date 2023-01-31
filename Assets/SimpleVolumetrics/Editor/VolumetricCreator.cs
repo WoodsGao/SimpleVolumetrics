@@ -16,6 +16,12 @@ namespace SimpleVolumetrics
             // instantiate material
             MeshRenderer renderer = obj.GetComponent<MeshRenderer>();
             renderer.sharedMaterial = Material.Instantiate(renderer.sharedMaterial);
+
+            // update mesh bounds
+            MeshFilter filter = obj.GetComponent<MeshFilter>();
+            Bounds bounds = filter.sharedMesh.bounds;
+            bounds.size = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+            filter.sharedMesh.bounds = bounds;
         }
 
         private const string _baseName = "Volumetric Base";
@@ -30,6 +36,13 @@ namespace SimpleVolumetrics
         public static void CreateVolumetricSpotLight(MenuCommand menuCommand)
         {
             InstantiatePrefab(menuCommand, _spotLightName);
+        }
+
+        private const string _pointLightName = "Volumetric PointLight";
+        [MenuItem("GameObject/SimpleVolumetric/" + _pointLightName, false, 11)]
+        public static void CreateVolumetricPointLight(MenuCommand menuCommand)
+        {
+            InstantiatePrefab(menuCommand, _pointLightName);
         }
 
         private const string _VATName = "Volumetric VAT";

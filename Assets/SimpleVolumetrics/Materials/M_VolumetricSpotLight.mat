@@ -10,6 +10,7 @@ Material:
   m_Name: M_VolumetricSpotLight
   m_Shader: {fileID: 4800000, guid: c6f562f44ef30b549a3e805ec21de6f1, type: 3}
   m_ValidKeywords:
+  - VOLUMETRIC_CAST_TO_FLOOR_ON
   - VOLUMETRIC_SHADOW_ON
   - VOLUMETRIC_TYPE_SPOTLIGHT
   m_InvalidKeywords: []
@@ -88,7 +89,7 @@ Material:
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
-    - _CAST_TO_FLOOR: 0
+    - _CAST_TO_FLOOR: 1
     - _ClearCoatMask: 0
     - _ClearCoatSmoothness: 0
     - _Cull: 2
@@ -111,7 +112,7 @@ Material:
     - _Parallax: 0.005
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _SHADOW: 0
+    - _SHADOW: 1
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
